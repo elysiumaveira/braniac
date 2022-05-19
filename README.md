@@ -1,1 +1,1 @@
-# braniac
+# КУРС ПО PYTHON.JANGO
