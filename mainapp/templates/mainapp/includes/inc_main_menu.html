@@ -4,7 +4,8 @@
             <a class="nav-link {% if '/news/' in request.path %}active{% endif %}" href="{% url 'mainapp:news' %}">Новости</a>
         </li>
         <li class="nav-item ">
-            <a class="nav-link {% if '/courses/' in request.path %}active{% endif %}" href="{% url 'mainapp:courses' %}">Курсы</a>
+            <a class="nav-link {% if '/courses/' in request.path %}active{% endif %}"
+               href="{% url 'mainapp:courses' %}">Курсы</a>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="ddProfile" role="button" data-toggle="dropdown"
@@ -22,8 +23,24 @@
             </div>
         </li>
         <li class="nav-item ">
-            <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}" href="{% url 'mainapp:contacts' %}">Контакты</a>
+            <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
+               href="{% url 'mainapp:contacts' %}">Контакты</a>
         </li>
+        {% if user.is_authenticated %}
+            <li class="nav-item ">
+                <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
+                   href="{% url 'authapp:edit' %}">{{ user.first_name|default:user.username }}</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
+                   href="{% url 'authapp:logout' %}">Выход</a>
+            </li>
+        {% else %}
+            <li class="nav-item ">
+                <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}"
+                   href="{% url 'authapp:login' %}">Вход</a>
+            </li>
+        {% endif %}
     </ul>
     <span><a href="#">🇷🇺</a> <i class="fas fa-grip-lines-vertical"></i> <a href="#">🇬🇧</a></span>
 </div>
