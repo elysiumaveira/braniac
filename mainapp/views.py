@@ -3,8 +3,10 @@ import json
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from django.shortcuts import get_object_or_404
 
 from mainapp.models import News
+from mainapp import models as mainapp_models
 
 
 class ContactsView(TemplateView):
@@ -42,6 +44,24 @@ class ContactsView(TemplateView):
 class CoursesListView(TemplateView):
     template_name = 'mainapp/courses_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(CoursesListView, self).get_context_data(**kwargs)
+        context['courses_list'] = mainapp_models.Course.objects.all()
+
+        return context
+
+
+class CoursesDetailView(TemplateView):
+    template_name = 'mainapp/courses_detail.html'
+
+    def get_context_data(self, pk=None, **kwargs):
+        context = super(CoursesDetailView, self).get_context_data(**kwargs)
+        context['course_object'] = get_object_or_404(mainapp_models.Course, pk=pk)
+        context['lessons'] = mainapp_models.Lesson.objects.filter(course=context['course_object'])
+        context['teachers'] = mainapp_models.CourseTeachers.objects.filter(course=context['course_object'])
+
+        return context
+
 
 class DocSiteView(TemplateView):
     template_name = 'mainapp/doc_site.html'
@@ -64,9 +84,12 @@ class NewsView(TemplateView):
 
         return context_data
 
-    def get(self, *args, **kwargs):
-        query = self.request.GET.get('q', None)
-        if query:
-            return HttpResponseRedirect(f'https://google.ru/search?q={query}')
 
-        return super().get(*args, **kwargs)
+class NewsPageDetailView(TemplateView):
+    template_name = 'mainapp/news_detail.html'
+
+    def get_context_data(self, pk=None, **kwargs):
+        context = super().get_context_data(pk=pk, **kwargs)
+        context["news_object"] = get_object_or_404(mainapp_models.News, pk=pk)
+
+        return context

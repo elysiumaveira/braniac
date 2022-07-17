@@ -42,7 +42,14 @@ class News(BaseModel):
         verbose_name_plural = 'новости'
 
 
+class CoursesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
 class Course(BaseModel):
+    objects = CoursesManager()
+
     name = models.CharField(max_length=256, verbose_name='Name')
     description = models.TextField(verbose_name='Description', **NULLABLE)
     description_as_markdown = models.BooleanField(verbose_name='As markdown', default=False)
@@ -52,9 +59,13 @@ class Course(BaseModel):
     def __str__(self) -> str:
         return f'{self.pk} {self.name}'
 
+    def delete(self, *args):
+        self.deleted = True
+        self.save()
+
     class Meta:
         verbose_name = 'курс'
-        verbose_name_plural= 'курсы'
+        verbose_name_plural = 'курсы'
 
 
 class Lesson(BaseModel):
@@ -73,14 +84,19 @@ class Lesson(BaseModel):
         ordering = ('course', 'num')
 
 
-class CourseTeachers(BaseModel):
+class CourseTeachers(models.Model):
     course = models.ManyToManyField(Course)
     name_first = models.CharField(max_length=128, verbose_name='Name')
     name_second = models.CharField(max_length=128, verbose_name='Surname')
     day_birth = models.DateField(verbose_name='Birth date')
+    deleted = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return '{0:0>3} {1} {2}'.format(self.pk, self.name_second, self.name_first)
+
+    def delete(self, *args):
+        self.deleted = True
+        self.save()
 
     class Meta:
         verbose_name = 'учитель'
